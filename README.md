@@ -14,3 +14,28 @@ cd Olympiadnik_v2
 ```bash
 docker compose up --build -d
 ```
+
+## Tables description
+
+### Users
+
+Users table contains all information about user. It can be created with the following command (There and in all code below is PostgreSQL):
+
+```PostgreSQL
+CREATE TABLE users (
+    id UUID DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(15),
+    username VARCHAR(255) NOT NULL,
+    first_name VARCHAR(63),
+    last_name VARCHAR(63),
+    middle_name VARCHAR(63),
+    is_active SMALLINT,
+    permissions SMALLINT,
+    password_hashed VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+
+    PRIMARY KEY (id),
+)
+```
