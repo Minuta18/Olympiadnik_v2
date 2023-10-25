@@ -4,6 +4,7 @@ from sqlalchemy.ext import asyncio
 from sqlalchemy import orm
 import logging
 import dotenv
+import datetime
 
 dotenv.load_dotenv('./.env')
 
@@ -21,6 +22,12 @@ DATABASE_URL = 'postgresql+psycopg://{}:{}@{}:{}/{}'.format(
 
 OPENAPI_URL = '{}/auth/openapi.json'.format(PREFIX)
 DOCS_URL = '{}/auth/docs'.format(PREFIX)
+
+ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
+
+# TODO: change this in production
+SECRET_KEY = 'f7724738e073cb1ed50634eb8cb28ac9dcacbb2014f0f02f27bbf19c35e02bcc'
+ALG = 'HS256'
 
 # All database operations should be asynchronous to make service faster
 engine = asyncio.create_async_engine(DATABASE_URL)

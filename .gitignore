@@ -1,4 +1,8 @@
-volumes/
+volumes/database/data
+volumes/nginx/sites-enabled
+volumes/nginx/ssl
+volumes/nginx/var
+volumes/pgadmin/data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
