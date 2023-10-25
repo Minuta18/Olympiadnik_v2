@@ -9,7 +9,7 @@ my_app = fastapi.FastAPI(
 
 @my_app.on_event('startup')
 async def startup_event():
-    # await views.destroy_models()
+    await views.destroy_models()
 
     await views.init_models()
 

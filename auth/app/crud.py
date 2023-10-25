@@ -64,12 +64,18 @@ async def create_user(
 async def get_user(
             db: asyncio.AsyncSession, 
             user_id = ...,
-            user_email: str =...,
+            user_email: str = ...,
+            username: str = ...,
+            phone: str = ...,
         ) -> models.User:
     if not isinstance(user_id, ...):
         return await db.get(models.User, user_id)
     elif not isinstance(user_email, ...):
         return await db.get(models.User, user_email)
+    elif not isinstance(username, ...):
+        return (await db.execute(sql.select(models.User).where(models.User.username == username))).scalars().first()
+    elif not isinstance(phone, ...):
+        return (await db.execute(sql.select(models.User).where(models.User.phone == phone))).scalars().first()
     raise ValueError('Please specify user_id or user_email')
 
 async def get_users(

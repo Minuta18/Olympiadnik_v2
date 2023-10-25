@@ -1,8 +1,13 @@
 from passlib import context
 import fastapi
+from fastapi import security
+import typing
 import app
 import datetime
 import jose
+import asyncio
+import models
+import crud
 import app.schemas as schemas
 
 router = fastapi.APIRouter(prefix=f'{app.PREFIX}/auth')
@@ -33,6 +38,44 @@ def get_access_token(data: dict, expires: datetime.timedelta|None = None):
 
     return encoded_jwt
 
+async def authenticate(
+            db: asyncio.AsyncSession,
+            username: str = ...,
+            email: str = ...,
+            phone: str = ...,
+            password: str = ...,        
+        ) -> models.User|None:
+    user = None
+    if not isinstance(username, ...):
+        user = await crud.get_user(db, username=username)
+    elif not isinstance(username, ...):
+        user = await crud.get_user(db, user_email=email)
+    elif not isinstance(phone, ...):
+        user = await crud.get_user(db, phone=phone)
+    if user is None:
+        return user
+    return user if verify_password(password, user.hashed_password) else None
+
 @router.post('/get_token', response_model=schemas.Token)
-def get_token():
-    ...
+async def get_token(
+            form_data: typing.Annotated[security.OAuth2PasswordRequestForm, fastapi.Depends()],
+            db: asyncio.AsyncSession = fastapi.Depends(crud.get_session),
+        ):
+    username = form_data.username
+    password = form_data.password
+    
+    user = await authenticate(db, username=username, password=password)
+    if user is None:
+        raise fastapi.HTTPException(
+            status_code=401,
+            detail='Incorrect username or password',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+        
+    token = ...
+        
+    return {
+        'error': False,
+        'access_token': token,
+        'token_type': 'beares',
+    }

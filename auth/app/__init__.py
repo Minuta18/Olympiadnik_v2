@@ -25,7 +25,7 @@ DOCS_URL = '{}/auth/docs'.format(PREFIX)
 
 ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
 
-# TODO: change this in production
+# TODO: change secret key in production
 SECRET_KEY = 'f7724738e073cb1ed50634eb8cb28ac9dcacbb2014f0f02f27bbf19c35e02bcc'
 ALG = 'HS256'
 
