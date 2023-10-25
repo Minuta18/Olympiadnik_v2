@@ -4,14 +4,13 @@ from fastapi import security
 import typing
 import app
 import datetime
-import jose
-import asyncio
+import jwt
 import models
 import crud
+from sqlalchemy.ext import asyncio
 import app.schemas as schemas
 
 router = fastapi.APIRouter(prefix=f'{app.PREFIX}/auth')
-pwd_context = context.CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def init_models():
     async with app.engine.begin() as conn:
@@ -21,50 +20,49 @@ async def destroy_models():
     async with app.engine.begin() as conn:
         await conn.run_sync(app.base.metadata.drop_all)
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def generate_token(
+        type: str,
+        subject: typing.Any,
+        payload: typing.Any,
+        ttl: typing.Any,
+    ):
+    current_timestamp = datetime.datetime.utcnow().timestamp()
+    data = {
+        'iss': 'olimpiadnik.system@gmail.com',
+        'sub': subject,
+        'type': type,
+        'iat': current_timestamp,
+        'exp': payload['nbf'] if payload.get('nbf') else current_timestamp
+    }
+    data.update(dict(exp=data['nbf'] + int(ttl.total_seconds()))) if ttl else None
+    payload.update(data)
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+    return jwt.encode(payload=payload, key=app.SECRET_KEY, algorithm='HS256')
 
-def get_access_token(data: dict, expires: datetime.timedelta|None = None):
-    to_encode = data.copy()
-    if expires:
-        expire = datetime.utcnow() + expires
-    else:
-        expire = datetime.utcnow() + datetime.timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jose.jwt.encode(to_encode, app.SECRET_KEY, algorithm=app.HS256)
+async def login_by_access_token(
+        db: asyncio.AsyncSession, 
+        token: str
+    ):
+    try:
+        payload = jwt.decode(token, app.SECRET_KEY, algorithms=['HS256'])
+        if payload.get('type') != 'access':
+            raise ValueError('This is not an access token')
 
-    return encoded_jwt
-
-async def authenticate(
-            db: asyncio.AsyncSession,
-            username: str = ...,
-            email: str = ...,
-            phone: str = ...,
-            password: str = ...,        
-        ) -> models.User|None:
-    user = None
-    if not isinstance(username, ...):
-        user = await crud.get_user(db, username=username)
-    elif not isinstance(username, ...):
-        user = await crud.get_user(db, user_email=email)
-    elif not isinstance(phone, ...):
-        user = await crud.get_user(db, phone=phone)
-    if user is None:
+        user = await crud.get_user(db, user_id=payload['sub'])
         return user
-    return user if verify_password(password, user.hashed_password) else None
+    except jwt.InvalidTokenError or KeyError:
+        raise ValueError('Invalid access token')
+
 
 @router.post('/get_token', response_model=schemas.Token)
 async def get_token(
-            form_data: typing.Annotated[security.OAuth2PasswordRequestForm, fastapi.Depends()],
-            db: asyncio.AsyncSession = fastapi.Depends(crud.get_session),
-        ):
+        form_data: typing.Annotated[security.OAuth2PasswordRequestForm, fastapi.Depends()],
+        db: asyncio.AsyncSession = fastapi.Depends(crud.get_session),
+    ):
     username = form_data.username
     password = form_data.password
     
-    user = await authenticate(db, username=username, password=password)
+    user = await authenticate(db, username=username, password=password) # TODO 
     if user is None:
         raise fastapi.HTTPException(
             status_code=401,
