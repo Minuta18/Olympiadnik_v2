@@ -19,7 +19,7 @@ def event_loop():
 @pytest.mark.asyncio
 @pytest.mark.order(1)
 async def test_health_check():
-    response = await client.get('auth/health')
+    response = await client.get('users/health')
     assert response.status_code == 200
 
     response_json = await response.json()
