@@ -12,3 +12,4 @@ async def init_models():
 async def destroy_models():
     async with app.engine.begin() as conn:
         await conn.run_sync(app.base.metadata.drop_all)
+

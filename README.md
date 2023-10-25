@@ -23,15 +23,17 @@ Users table contains all information about user. It can be created with the foll
 
 ```PostgreSQL
 CREATE TABLE users (
-    id UUID DEFAULT uuid_generate_v4(),
+    id BIGINT NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(15),
     username VARCHAR(255) NOT NULL,
     first_name VARCHAR(63),
     last_name VARCHAR(63),
     middle_name VARCHAR(63),
-    is_active SMALLINT,
-    permissions SMALLINT,
+    is_active SMALLINT NOT NULL,
+    is_deleted SMALLINT NOT NULL,
+    is_banned SMALLINT NOT NULL,
+    permissions SMALLINT NOT NULL,
     password_hashed VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,

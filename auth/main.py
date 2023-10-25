@@ -1,6 +1,5 @@
 import fastapi
 import app
-import logging
 from app import views
 
 my_app = fastapi.FastAPI(
@@ -19,5 +18,3 @@ async def shutdown_event():
     await app.engine.dispose()
 
 my_app.include_router(views.router)
-
-print('Server started')
