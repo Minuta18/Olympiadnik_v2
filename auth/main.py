@@ -1,5 +1,6 @@
 import fastapi
 import app
+import logging
 from app import views
 
 my_app = fastapi.FastAPI(

@@ -68,13 +68,13 @@ async def get_user(
         username: str = ...,
         phone: str = ...,
     ) -> models.User:
-    if not isinstance(user_id, ...):
+    if user_id != ...:
         return await db.get(models.User, user_id)
-    elif not isinstance(user_email, ...):
-        return await db.get(models.User, user_email)
-    elif not isinstance(username, ...):
+    elif user_email != ...:
+        return (await db.execute(sql.select(models.User).where(models.User.email == user_email))).scalars().first()
+    elif username != ...:
         return (await db.execute(sql.select(models.User).where(models.User.username == username))).scalars().first()
-    elif not isinstance(phone, ...):
+    elif phone != ...:
         return (await db.execute(sql.select(models.User).where(models.User.phone == phone))).scalars().first()
     raise ValueError('Please specify user_id or user_email')
 
@@ -103,29 +103,29 @@ async def update_user(
             is_banned: bool = ...,
             is_confirmed: bool = ...,
         ) -> models.User:
-    if not isinstance(email, ...):
+    if email != ...:
         user.email = email
-    if not isinstance(phone, ...):
+    if phone != ...:
         user.phone = phone
-    if not isinstance(username, ...):
+    if username != ...:
         user.username = username
-    if not isinstance(first_name, ...):
+    if first_name != ...:
         user.first_name = first_name
-    if not isinstance(last_name, ...):
+    if last_name != ...:
         user.last_name = last_name
-    if not isinstance(middle_name, ...):
+    if middle_name != ...:
         user.middle_name = middle_name
-    if not isinstance(hashed_password, ...):
+    if hashed_password != ...:
         user.hashed_password = hashed_password
-    if not isinstance(permissions, ...):
+    if permissions != ...:
         user.permissions = permissions
-    if not isinstance(is_active, ...):
+    if is_active != ...:
         user.is_active = is_active
-    if not isinstance(is_deleted, ...):
+    if is_deleted != ...:
         user.is_deleted = is_deleted
-    if not isinstance(is_banned, ...):
+    if is_banned != ...:
         user.is_banned = is_banned
-    if not isinstance(is_confirmed, ...):
+    if is_confirmed != ...:
         user.is_confirmed = is_confirmed
 
     db.add(user)

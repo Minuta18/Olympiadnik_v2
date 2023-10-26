@@ -4,9 +4,9 @@ import app
 class User(app.base):
     __tablename__ = 'users'
 
-    id = sql.Column(sql.BigInteger, primary_key=True)
+    id = sql.Column(sql.BigInteger, primary_key=True, autoincrement=True)
 
-    email = sql.Column(sql.String(255), unique=True, nullable=False, primary_key=True)
+    email = sql.Column(sql.String(255), unique=True, nullable=False)
     phone = sql.Column(sql.String(15), unique=True)
 
     username = sql.Column(sql.String(255), unique=True, nullable=False)
@@ -23,4 +23,4 @@ class User(app.base):
     is_banned = sql.Column(sql.Boolean(), nullable=False)
 
     created_at = sql.Column(sql.DateTime, server_default=sql.sql.func.now())
-    updated_at = sql.Column(sql.DateTime, onupdate=sql.sql.func.now())
+    updated_at = sql.Column(sql.DateTime, server_default=sql.sql.func.now(), onupdate=sql.sql.func.now())

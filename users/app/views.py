@@ -12,7 +12,7 @@ router = fastapi.APIRouter(prefix=f'{app.PREFIX}/users')
 pwd_context = context.CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 EMAIL_VALIDATION = re.compile(r'''^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$''')
-PHONE_VALIDATION = re.compile(r'''^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$''')
+PHONE_VALIDATION = re.compile(r'''^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$''')
 
 async def init_models():
     async with app.engine.begin() as conn:
@@ -41,15 +41,17 @@ async def verify_password_endpoint(
     ):
     user = None
     if data.username is not None:
-        user = crud.get_user(db, username=data.username)
+        user = await crud.get_user(db, username=data.username)
     elif data.email is not None:
-        user = crud.get_user(db, email=data.email)
+        user = await crud.get_user(db, user_email=data.email)
     elif data.phone is not None:
-        user = crud.get_user(db, phone=data.phone)
+        user = await crud.get_user(db, phone=data.phone)
+    elif data.id is not None:
+        user = await crud.get_user(db, user_id=data.id)
     else:
-        raise fastapi.responses.JSONResponse(content={
+        return fastapi.responses.JSONResponse(content={
             'error': True,
-            'message': 'Username, email or phone is required',
+            'message': 'Username, email, phone or id is required',
         }, status_code=400)
     if verify_password(data.password, user.hashed_password):
         return {
@@ -81,7 +83,7 @@ async def create_user(
                'message': 'Invalid phone'
             }, status_code=400)
 
-        usr = crud.create_user(
+        usr = await crud.create_user(
             db,
             email=data.email,
             phone=phone,
@@ -108,7 +110,7 @@ async def create_user(
             'updated_at': usr.updated_at.isoformat(),
         }
     except exc.IntegrityError as e:
-        raise fastapi.responses.JSONResponse(content={
+        return fastapi.responses.JSONResponse(content={
             'error': True,
             'message': 'Username, email or phone already exists',
         }, status_code=400)

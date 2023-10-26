@@ -4,6 +4,7 @@ class VerifyPasswordSchema(BaseModel):
     username: str|None = None
     email: str|None = None
     phone: str|None = None
+    id: int|None = None
     password: str
 
 class CreateUserSchema(BaseModel):
