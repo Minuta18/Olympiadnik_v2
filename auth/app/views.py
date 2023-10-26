@@ -5,8 +5,8 @@ import typing
 import app
 import datetime
 import jwt
-import models
-import crud
+from app import models
+from app import crud
 from sqlalchemy.ext import asyncio
 import app.schemas as schemas
 

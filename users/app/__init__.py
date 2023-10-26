@@ -20,8 +20,8 @@ DATABASE_URL = 'postgresql+psycopg://{}:{}@{}:{}/{}'.format(
     else environ.get('DB_TEST', default='test'),
 )
 
-OPENAPI_URL = '{}/auth/openapi.json'.format(PREFIX)
-DOCS_URL = '{}/auth/docs'.format(PREFIX)
+OPENAPI_URL = '{}/users/openapi.json'.format(PREFIX)
+DOCS_URL = '{}/users/docs'.format(PREFIX)
 
 ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
 

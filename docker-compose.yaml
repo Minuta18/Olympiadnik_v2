@@ -76,9 +76,9 @@ services:
   users:
     build: 
       context: ./
-      dockerfile: ./auth/Dockerfile
+      dockerfile: ./users/Dockerfile
     restart: on-failure
-    command: uvicorn main:my_app --reload --host 0.0.0.0 --port 16113 --log-config ./log.ini
+    command: uvicorn main:my_app --reload --host 0.0.0.0 --port 16113
     environment:
       DB_HOST: 'database'
       DB_PORT: 5432
@@ -89,7 +89,7 @@ services:
       TESTING: false
       PREFIX: '/api/v1'
     volumes:
-      - ./volumes/auth/app.log:/app/app.log
+      - ./volumes/users/app.log:/app/app.log
     expose:
       - '16113:16113'
     depends_on:
